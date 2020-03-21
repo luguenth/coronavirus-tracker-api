@@ -48,7 +48,7 @@ def get_category(category):
     category = category.lower().capitalize();
 
     # # Request the data
-    data = self.get_data()
+    data = get_data()
 
     # THIS IS FOR TESTING PURPOSES ONLY
     return  {
@@ -122,25 +122,20 @@ def get_locations():
     """
     # Get all of the data categories locations.
     confirmed = get_category('confirmed')['locations']
-    # deaths    = get_category('deaths')['locations']
-    # recovered = get_category('recovered')['locations']
+    deaths    = get_category('deaths')['locations']
+    recovered = get_category('recovered')['locations']
 
     # Final locations to return.
     locations = []
 
     # Go through locations.
-    # return "hi"
     for index, location in enumerate(confirmed):
-        print(index,location)
         # Get the timelines.
         # Format: { "12/02/90": 25, ... }
         timelines = {
-                'confirmed' : {"12/02/90":25},
-                'deaths' : {"12/02/90":25},
-                'recovered' : {"12/02/90":25},
-            # 'confirmed' : confirmed[index]['history'],
-            # 'deaths'    : deaths[index]['history'],
-            # 'recovered' : recovered[index]['history'],
+            'confirmed' : confirmed[index]['history'],
+            'deaths'    : deaths[index]['history'],
+            'recovered' : recovered[index]['history'],
         }
 
         # Grab coordinates.
