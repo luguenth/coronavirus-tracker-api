@@ -23,6 +23,8 @@ import csv
 from datetime import datetime
 from cachetools import cached, TTLCache
 from ...utils import countrycodes, date as date_util
+import pprint
+import json
 
 """
 Base URL for fetching category.
@@ -30,6 +32,7 @@ Base URL for fetching category.
 base_url = "https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query"
 
 def get_data(): 
+
     states = {
         8: 'Baden-Württemberg',
         5: 'Nordrhein-Westfalen',
@@ -62,6 +65,18 @@ def get_data():
         payload = ""
         response = requests.request("GET", base_url, data=payload, params=querystring)
         pprint.pprint(response.json())
+        return accumulate_days(response.json()['features'])
+
+def accumulate_days(features):
+    new_arr = {}
+    for feature in features:
+        time_melde = feature['attributes']['Meldedatum']
+        try:
+            new_arr[time_melde] = new_arr[time_melde] + feature['attributes']['AnzahlFall']
+        except KeyError:
+            new_arr[time_melde] = 1
+
+    return new_arr
 
 # @cached(cache=TTLCache(maxsize=1024, ttl=3600))
 def get_category(category):
@@ -140,7 +155,7 @@ def get_category(category):
         'source': 'https://github.com/ExpDev07/coronavirus-tracker-api',
     }
 
-@cached(cache=TTLCache(maxsize=1024, ttl=3600))
+#@cached(cache=TTLCache(maxsize=1024, ttl=3600))
 def get_locations():
     """
     Retrieves the locations from the categories. The locations are cached for 1 hour.
@@ -191,7 +206,7 @@ def get_locations():
             }
         ))
 
-    print(locations)
+    #print(locations)
     
     # Finally, return the locations.
     return locations 
