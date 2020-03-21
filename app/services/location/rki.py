@@ -23,6 +23,8 @@ import csv
 from datetime import datetime
 from cachetools import cached, TTLCache
 from ...utils import countrycodes, date as date_util
+import pprint
+import json
 
 """
 Base URL for fetching category.
@@ -33,7 +35,21 @@ def get_data():
     querystring = {"f":"json","where":"Bundesland='Niedersachsen'","returnGeometry":"false","outFields":"AnzahlFall,Meldedatum","spatialRel":"esriSpatialRelIntersects","orderByFields":"Meldedatum","cacheHInt":"true"} 
     payload = ""
     response = requests.request("GET", base_url, data=payload, params=querystring)
-    print("RKI-Daten:", response.text)
+
+    return accumulate_days(response.json()['features'])
+
+
+
+def accumulate_days(features):
+    new_arr = {}
+    for feature in features:
+        time_melde = feature['attributes']['Meldedatum']
+        try:
+            new_arr[time_melde] = new_arr[time_melde] + feature['attributes']['AnzahlFall']
+        except KeyError:
+            new_arr[time_melde] = 1
+
+    return new_arr
 
 # @cached(cache=TTLCache(maxsize=1024, ttl=3600))
 def get_category(category):
@@ -48,7 +64,7 @@ def get_category(category):
     category = category.lower().capitalize();
 
     # # Request the data
-    data = self.get_data()
+    data = get_data()
 
     # THIS IS FOR TESTING PURPOSES ONLY
     return  {
@@ -112,7 +128,7 @@ def get_category(category):
         'source': 'https://github.com/ExpDev07/coronavirus-tracker-api',
     }
 
-@cached(cache=TTLCache(maxsize=1024, ttl=3600))
+#@cached(cache=TTLCache(maxsize=1024, ttl=3600))
 def get_locations():
     """
     Retrieves the locations from the categories. The locations are cached for 1 hour.
@@ -131,7 +147,6 @@ def get_locations():
     # Go through locations.
     # return "hi"
     for index, location in enumerate(confirmed):
-        print(index,location)
         # Get the timelines.
         # Format: { "12/02/90": 25, ... }
         timelines = {
@@ -168,7 +183,7 @@ def get_locations():
             }
         ))
 
-    print(locations)
+    #print(locations)
     
     # Finally, return the locations.
     return locations 
