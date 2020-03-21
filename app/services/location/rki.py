@@ -52,10 +52,10 @@ def get_data():
         4: 'Bremen'
     }
 
-    for states in states:
+    for key, state in states.items():
         querystring = {
             "f": "json",
-            "where": "Bundesland='Niedersachsen'",
+            "where": f"Bundesland='{state}'",
             "returnGeometry": "false",
             "outFields": "AnzahlFall, Meldedatum",
             "spatialRel": "esriSpatialRelIntersects",
