@@ -30,10 +30,38 @@ Base URL for fetching category.
 base_url = "https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query"
 
 def get_data(): 
-    querystring = {"f":"json","where":"Bundesland='Niedersachsen'","returnGeometry":"false","outFields":"AnzahlFall,Meldedatum","spatialRel":"esriSpatialRelIntersects","orderByFields":"Meldedatum","cacheHInt":"true"} 
-    payload = ""
-    response = requests.request("GET", base_url, data=payload, params=querystring)
-    print("RKI-Daten:", response.text)
+    states = {
+        8: 'Baden-Württemberg',
+        5: 'Nordrhein-Westfalen',
+        9: 'Bayern',
+        6: 'Hessen',
+        3: 'Niedersachsen',
+        7: 'Rheinland-Pfalz',
+        11: 'Berlin',
+        2: 'Hamburg',
+        14: 'Sachsen',
+        1: 'Schleswig-Holstein',
+        12: 'Brandenburg',
+        15: 'Sachsen-Anhalt',
+        10: 'Saarland',
+        16: 'Thüringen',
+        13: 'Mecklenburg-Vorpommern',
+        4: 'Bremen'
+    }
+
+    for states in states:
+        querystring = {
+            "f": "json",
+            "where": "Bundesland='Niedersachsen'",
+            "returnGeometry": "false",
+            "outFields": "AnzahlFall, Meldedatum",
+            "spatialRel": "esriSpatialRelIntersects",
+            "orderByFields": "Meldedatum",
+            "cacheHInt": "true"
+        }
+        payload = ""
+        response = requests.request("GET", base_url, data=payload, params=querystring)
+        pprint.pprint(response.json())
 
 # @cached(cache=TTLCache(maxsize=1024, ttl=3600))
 def get_category(category):
