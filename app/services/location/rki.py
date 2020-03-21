@@ -32,13 +32,40 @@ Base URL for fetching category.
 base_url = "https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query"
 
 def get_data(): 
-    querystring = {"f":"json","where":"Bundesland='Niedersachsen'","returnGeometry":"false","outFields":"AnzahlFall,Meldedatum","spatialRel":"esriSpatialRelIntersects","orderByFields":"Meldedatum","cacheHInt":"true"} 
-    payload = ""
-    response = requests.request("GET", base_url, data=payload, params=querystring)
 
-    return accumulate_days(response.json()['features'])
+    states = {
+        8: 'Baden-Württemberg',
+        5: 'Nordrhein-Westfalen',
+        9: 'Bayern',
+        6: 'Hessen',
+        3: 'Niedersachsen',
+        7: 'Rheinland-Pfalz',
+        11: 'Berlin',
+        2: 'Hamburg',
+        14: 'Sachsen',
+        1: 'Schleswig-Holstein',
+        12: 'Brandenburg',
+        15: 'Sachsen-Anhalt',
+        10: 'Saarland',
+        16: 'Thüringen',
+        13: 'Mecklenburg-Vorpommern',
+        4: 'Bremen'
+    }
 
-
+    for states in states:
+        querystring = {
+            "f": "json",
+            "where": "Bundesland='Niedersachsen'",
+            "returnGeometry": "false",
+            "outFields": "AnzahlFall, Meldedatum",
+            "spatialRel": "esriSpatialRelIntersects",
+            "orderByFields": "Meldedatum",
+            "cacheHInt": "true"
+        }
+        payload = ""
+        response = requests.request("GET", base_url, data=payload, params=querystring)
+        pprint.pprint(response.json())
+        return accumulate_days(response.json()['features'])
 
 def accumulate_days(features):
     new_arr = {}
@@ -138,24 +165,20 @@ def get_locations():
     """
     # Get all of the data categories locations.
     confirmed = get_category('confirmed')['locations']
-    # deaths    = get_category('deaths')['locations']
-    # recovered = get_category('recovered')['locations']
+    deaths    = get_category('deaths')['locations']
+    recovered = get_category('recovered')['locations']
 
     # Final locations to return.
     locations = []
 
     # Go through locations.
-    # return "hi"
     for index, location in enumerate(confirmed):
         # Get the timelines.
         # Format: { "12/02/90": 25, ... }
         timelines = {
-                'confirmed' : {"12/02/90":25},
-                'deaths' : {"12/02/90":25},
-                'recovered' : {"12/02/90":25},
-            # 'confirmed' : confirmed[index]['history'],
-            # 'deaths'    : deaths[index]['history'],
-            # 'recovered' : recovered[index]['history'],
+            'confirmed' : confirmed[index]['history'],
+            'deaths'    : deaths[index]['history'],
+            'recovered' : recovered[index]['history'],
         }
 
         # Grab coordinates.
