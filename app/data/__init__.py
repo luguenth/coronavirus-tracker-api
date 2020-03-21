@@ -1,8 +1,10 @@
 from ..services.location.jhu import JhuLocationService
+from ..services.location.jhu import RkiLocationService
 
 # Mapping of services to data-sources.
 data_sources = {
     'jhu': JhuLocationService(),
+    'rki': RkiLocationService(),
 }
 
 def data_source(source):
