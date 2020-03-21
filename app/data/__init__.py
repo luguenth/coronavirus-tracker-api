@@ -1,5 +1,5 @@
 from ..services.location.jhu import JhuLocationService
-from ..services.location.jhu import RkiLocationService
+from ..services.location.rki import RkiLocationService
 
 # Mapping of services to data-sources.
 data_sources = {
